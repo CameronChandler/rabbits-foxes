@@ -14,7 +14,7 @@ WIDTH, HEIGHT = 0, 1
 
 class Boid(pg.sprite.Sprite):
 
-    def __init__(self, grid, window_size: tuple[int, int]):  #, cHSV=None
+    def __init__(self, grid: pg.sprite.Group, window_size: tuple[int, int]):  #, cHSV=None
         super().__init__()
         self.grid = grid
         self.window_size = window_size
@@ -30,7 +30,7 @@ class Boid(pg.sprite.Sprite):
                                                 randint(50, self.window_size[HEIGHT] - 50)))
         self.ang = randint(0, 360)  # random start angle, & position ^
         self.pos = pg.Vector2(self.rect.center)
-        self.grid_lastpos = self.grid.getcell(self.pos)
+        self.grid_lastpos = self.grid.get_cell(self.pos)
         self.grid.add(self, self.grid_lastpos)
 
     def update(self, dt, speed):
@@ -40,13 +40,13 @@ class Boid(pg.sprite.Sprite):
         margin = 42
         self.ang = self.ang + randint(-4, 4)
         # Grid update stuff
-        self.grid_pos = self.grid.getcell(self.pos)
+        self.grid_pos = self.grid.get_cell(self.pos)
         if self.grid_pos != self.grid_lastpos:
             self.grid.add(self, self.grid_pos)
             self.grid.remove(self, self.grid_lastpos)
             self.grid_lastpos = self.grid_pos
         # get nearby boids and sort by distance
-        near_boids = self.grid.getnear(self, self.grid_pos)
+        near_boids = self.grid.get_near(self, self.grid_pos)
         neiboids = sorted(near_boids, key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # when boid has neighborS (walrus sets ncount)

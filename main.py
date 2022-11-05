@@ -1,4 +1,5 @@
-from boids import Boid
+from boid import Boid
+from grid import Grid
 import pygame as pg
 
 '''
@@ -12,42 +13,10 @@ SPEED = 150             # Movement speed
 WIDTH = 900             # Window Width (1200)
 HEIGHT = 600            # Window Height (800)
 BGCOLOR = (0, 0, 0)     # Background color in RGB
-FPS = 60                # 30-90
+FPS = 60                # 30-9int(0
 SHOW_FPS = True          # frame rate debug
 
 
-class BoidGrid:
-    ''' Tracks boids in spatially partitioned grid '''
-
-    def __init__(self):
-        self.grid_size = 100
-        self.dict = {}
-    
-    def getcell(self, pos):
-        ''' finds the grid cell corresponding to given pos '''
-        return (pos[0]//self.grid_size, pos[1]//self.grid_size)
-    
-    def add(self, boid, key):
-        ''' boids add themselves to cells when crossing into new cell '''
-        if key in self.dict:
-            self.dict[key].append(boid)
-        else:
-            self.dict[key] = [boid]
-    
-    def remove(self, boid, key):
-        ''' they also remove themselves from the previous cell '''
-        if key in self.dict and boid in self.dict[key]:
-            self.dict[key].remove(boid)
-    
-    def getnear(self, boid, key):
-        ''' Returns a list of nearby boids within all surrounding 9 cells '''
-        if key in self.dict:
-            nearby = []
-            for x in (-1, 0, 1):
-                for y in (-1, 0, 1):
-                    nearby += self.dict.get((key[0] + x, key[1] + y), [])
-            nearby.remove(boid)
-        return nearby
 
 class Window:
 
@@ -81,10 +50,10 @@ def is_quit() -> bool:
 def main():
     window = Window(FULL_SCREEN, SHOW_FPS)
 
-    boidTracker = BoidGrid()
+    boidTracker = Grid()
     boids = pg.sprite.Group()
 
-    for n in range(NUM_BOIDS): 
+    for _ in range(NUM_BOIDS): 
         boids.add(Boid(boidTracker, window.screen.get_size()))
 
     clock = pg.time.Clock()
