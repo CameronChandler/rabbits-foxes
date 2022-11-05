@@ -46,7 +46,5 @@ class Grid:
             boid.update(dt, self.get_neighbours(boid)) # type: ignore
             self.update_cell(boid) # type: ignore
 
-            
-
     def draw(self, screen: pg.surface.Surface) -> None:
         self.boids.draw(screen)

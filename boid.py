@@ -21,11 +21,13 @@ class Boid(pg.sprite.Sprite):
         super().__init__()
         self.screen_size = screen_size
         self.grid_size = grid_size
+
         self.image = pg.Surface((15, 15)).convert()
         self.image.set_colorkey(0)
         self.color = pg.Color(0)  # preps color so we can use hsva
         self.color.hsva = (randint(0, 360), 90, 90) #if cHSV is None else cHSV # randint(5,55)
         pg.draw.polygon(self.image, self.color, ((7,0), (13,14), (7,11), (1,14), (7,0)))
+
         self.bSize = 17
         self.orig_image = pg.transform.rotate(self.image.copy(), -90)
         self.dir = pg.Vector2(1, 0)  # sets up forward direction
@@ -72,19 +74,18 @@ class Boid(pg.sprite.Sprite):
                 turnDir = -turnDir
 
         # Avoid edges of screen by turning toward the edge normal-angle
-        sc_x, sc_y = self.rect.centerx, self.rect.centery
-        if min(sc_x, sc_y, self.screen_size[WIDTH ] - sc_x, self.screen_size[HEIGHT] - sc_y) < margin:
-            if sc_x < margin: 
+        if min(self.x, self.y, self.screen_size[WIDTH ] - self.x, self.screen_size[HEIGHT] - self.y) < margin:
+            if self.x < margin: 
                 tAngle = 0
-            elif sc_x > self.screen_size[WIDTH ] - margin: 
+            elif self.x > self.screen_size[WIDTH ] - margin: 
                 tAngle = 180
-            if sc_y < margin: 
+            if self.y < margin: 
                 tAngle = 90
-            elif sc_y > self.screen_size[HEIGHT] - margin: 
+            elif self.y > self.screen_size[HEIGHT] - margin: 
                 tAngle = 270
             angleDiff = (tAngle - self.ang) + 180  # increase turnRate to keep boids on screen
             turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
-            edgeDist = min(sc_x, sc_y, self.screen_size[WIDTH ] - sc_x, self.screen_size[HEIGHT] - sc_y)
+            edgeDist = min(self.x, self.y, self.screen_size[WIDTH ] - self.x, self.screen_size[HEIGHT] - self.y)
             turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #turnRate=minRate, 20=maxRate
         if turnDir != 0:  # steers based on turnDir, handles left or right
             self.ang += turnRate * abs(turnDir) / turnDir
@@ -97,6 +98,14 @@ class Boid(pg.sprite.Sprite):
         self.pos += self.dir * dt * (SPEED + (7 - ncount) * 5)  # movement speed
         
         self.rect.center = self.pos
+
+    @property
+    def x(self) -> float:
+        return self.rect.centerx
+
+    @property
+    def y(self) -> float:
+        return self.rect.centery
 
     @property
     def cell(self) -> Cell:

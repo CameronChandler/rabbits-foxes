@@ -1,4 +1,3 @@
-from boid import Boid
 from grid import Grid
 import pygame as pg
 
@@ -17,10 +16,9 @@ FPS = 60                # 30-9int(0
 SHOW_FPS = True          # frame rate debug
 
 
-
 class Window:
 
-    def __init__(self, full_screen: bool, show_fps: bool):
+    def __init__(self, full_screen: bool):
         self.screen = self.init_screen(full_screen)
         self.font = pg.font.Font(None, 30)
 
@@ -48,17 +46,13 @@ def is_quit() -> bool:
     return False
 
 def main():
-    window = Window(FULL_SCREEN, SHOW_FPS)
-    print(type(window.screen))
+    window = Window(FULL_SCREEN)
 
     grid = Grid(NUM_BOIDS, window.screen.get_size())
 
     clock = pg.time.Clock()
 
-    while True:
-        if is_quit():
-            pg.quit()
-            return
+    while not is_quit():
 
         window.screen.fill(BGCOLOR)
         dt = clock.tick(FPS) / 1000
@@ -71,6 +65,7 @@ def main():
 
         pg.display.update()
 
+    pg.quit()
+
 if __name__ == '__main__':
     main()
-    pg.quit()
