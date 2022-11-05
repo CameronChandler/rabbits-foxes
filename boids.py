@@ -10,14 +10,14 @@ Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 FULL_SCREEN = True       # True for Fullscreen, or False for Window
 NUM_BOIDS = 100             # How many boids to spawn, too many may slow fps
 SPEED = 150             # Movement speed
-
+WIDTH, HEIGHT = 0, 1
 
 class Boid(pg.sprite.Sprite):
 
-    def __init__(self, grid, drawSurf):  #, cHSV=None
+    def __init__(self, grid, window_size: tuple[int, int]):  #, cHSV=None
         super().__init__()
         self.grid = grid
-        self.drawSurf = drawSurf
+        self.window_size = window_size
         self.image = pg.Surface((15, 15)).convert()
         self.image.set_colorkey(0)
         self.color = pg.Color(0)  # preps color so we can use hsva
@@ -26,15 +26,14 @@ class Boid(pg.sprite.Sprite):
         self.bSize = 17
         self.orig_image = pg.transform.rotate(self.image.copy(), -90)
         self.dir = pg.Vector2(1, 0)  # sets up forward direction
-        maxW, maxH = self.drawSurf.get_size()
-        self.rect = self.image.get_rect(center=(randint(50, maxW - 50), randint(50, maxH - 50)))
+        self.rect = self.image.get_rect(center=(randint(50, self.window_size[WIDTH ] - 50), 
+                                                randint(50, self.window_size[HEIGHT] - 50)))
         self.ang = randint(0, 360)  # random start angle, & position ^
         self.pos = pg.Vector2(self.rect.center)
         self.grid_lastpos = self.grid.getcell(self.pos)
         self.grid.add(self, self.grid_lastpos)
 
     def update(self, dt, speed):
-        maxW, maxH = self.drawSurf.get_size()
         selfCenter = pg.Vector2(self.rect.center)
         turnDir = xvt = yvt = yat = xat = 0
         turnRate = 120 * dt  # about 120 seems ok
@@ -77,18 +76,18 @@ class Boid(pg.sprite.Sprite):
                 turnDir = -turnDir
         # Avoid edges of screen by turning toward the edge normal-angle
         sc_x, sc_y = self.rect.centerx, self.rect.centery
-        if min(sc_x, sc_y, maxW - sc_x, maxH - sc_y) < margin:
+        if min(sc_x, sc_y, self.window_size[WIDTH ] - sc_x, self.window_size[HEIGHT] - sc_y) < margin:
             if sc_x < margin: 
                 tAngle = 0
-            elif sc_x > maxW - margin: 
+            elif sc_x > self.window_size[WIDTH ] - margin: 
                 tAngle = 180
             if sc_y < margin: 
                 tAngle = 90
-            elif sc_y > maxH - margin: 
+            elif sc_y > self.window_size[HEIGHT] - margin: 
                 tAngle = 270
             angleDiff = (tAngle - self.ang) + 180  # increase turnRate to keep boids on screen
             turnDir = (angleDiff / 360 - (angleDiff // 360)) * 360 - 180
-            edgeDist = min(sc_x, sc_y, maxW - sc_x, maxH - sc_y)
+            edgeDist = min(sc_x, sc_y, self.window_size[WIDTH ] - sc_x, self.window_size[HEIGHT] - sc_y)
             turnRate = turnRate + (1 - edgeDist / margin) * (20 - turnRate) #turnRate=minRate, 20=maxRate
         if turnDir != 0:  # steers based on turnDir, handles left or right
             self.ang += turnRate * abs(turnDir) / turnDir

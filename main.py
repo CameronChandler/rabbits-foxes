@@ -85,7 +85,7 @@ def main():
     boids = pg.sprite.Group()
 
     for n in range(NUM_BOIDS): 
-        boids.add(Boid(boidTracker, window.screen))
+        boids.add(Boid(boidTracker, window.screen.get_size()))
 
     clock = pg.time.Clock()
 
@@ -96,7 +96,7 @@ def main():
 
         window.screen.fill(BGCOLOR)
         dt = clock.tick(FPS) / 1000
-        # update boid logic, then draw them
+        
         boids.update(dt, SPEED)
         boids.draw(window.screen)
         
