@@ -49,12 +49,9 @@ def is_quit() -> bool:
 
 def main():
     window = Window(FULL_SCREEN, SHOW_FPS)
+    print(type(window.screen))
 
-    boidTracker = Grid()
-    boids = pg.sprite.Group()
-
-    for _ in range(NUM_BOIDS): 
-        boids.add(Boid(boidTracker, window.screen.get_size()))
+    grid = Grid(NUM_BOIDS, window.screen.get_size())
 
     clock = pg.time.Clock()
 
@@ -66,8 +63,8 @@ def main():
         window.screen.fill(BGCOLOR)
         dt = clock.tick(FPS) / 1000
         
-        boids.update(dt, SPEED)
-        boids.draw(window.screen)
+        grid.update(dt)
+        grid.draw(window.screen)
         
         if SHOW_FPS: 
             window.draw_fps(int(clock.get_fps()))

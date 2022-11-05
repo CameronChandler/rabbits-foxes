@@ -1,21 +1,21 @@
-from boid import Boid
-from typing import NamedTuple
+from boid import Boid, Cell
 from collections import defaultdict
 import pygame as pg
 
 GRID_SIZE = 100
-Cell = NamedTuple('Cell', [('x', int), ('y', int)])
 
 class Grid:
     ''' Tracks boids in spatially partitioned grid '''
     grid_size = GRID_SIZE
 
-    def __init__(self):
+    def __init__(self, num_boids: int, screen_size: tuple[int, int]):
         self.cells: dict[Cell, list[Boid]] = defaultdict(list)
-    
-    def get_cell(self, pos: pg.math.Vector2) -> Cell:
-        ''' xy coords to cell '''
-        return Cell(int(pos[0]//self.grid_size), int(pos[1]//self.grid_size))
+        self.boids = pg.sprite.Group()
+
+        for _ in range(num_boids): 
+            boid = Boid(self, screen_size, self.grid_size)
+            self.boids.add(boid)
+            self.cells[boid.cell].append(boid)
     
     def add(self, boid: Boid, cell: Cell):
         ''' Add boid to cell '''
@@ -31,5 +31,10 @@ class Grid:
         for x in (-1, 0, 1):
             for y in (-1, 0, 1):
                 nearby += self.cells.get(Cell(cell.x + x, cell.y + y), [])
-        nearby.remove(boid)
         return nearby
+
+    def update(self, dt: float) -> None:
+        self.boids.update(dt)
+
+    def draw(self, screen: pg.surface.Surface) -> None:
+        self.boids.draw(screen)
