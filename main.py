@@ -8,7 +8,7 @@ This version uses a spatial partitioning grid to improve performance.
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
 FULL_SCREEN = False       # True for Fullscreen, or False for Window
-NUM_BOIDS = 100             # How many boids to spawn, too many may slow fps
+NUM_BOIDS = 1000             # How many boids to spawn, too many may slow fps
 SPEED = 150             # Movement speed
 WIDTH = 900             # Window Width (1200)
 HEIGHT = 600            # Window Height (800)

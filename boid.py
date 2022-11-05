@@ -17,9 +17,8 @@ Cell = NamedTuple('Cell', [('x', int), ('y', int)])
 
 class Boid(pg.sprite.Sprite):
 
-    def __init__(self, grid: pg.sprite.Group, screen_size: tuple[int, int], grid_size: int):
+    def __init__(self, screen_size: tuple[int, int], grid_size: int):
         super().__init__()
-        self.grid = grid
         self.screen_size = screen_size
         self.grid_size = grid_size
         self.image = pg.Surface((15, 15)).convert()
@@ -33,20 +32,12 @@ class Boid(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=(randint(50, self.screen_size[WIDTH ] - 50), 
                                                 randint(50, self.screen_size[HEIGHT] - 50)))
         self.ang = randint(0, 360)  # random start angle, & position ^
+
         self.pos = pg.Vector2(self.rect.center)
         self.prev_cell = self.cell
 
-    def update(self, dt: float) -> None:
-        # Grid update stuff
-        curr_cell = self.cell
-        if curr_cell != self.prev_cell:
-            self.grid.add(self, curr_cell)
-            self.grid.remove(self, self.prev_cell)
-            self.prev_cell = curr_cell
-        # get nearby boids and sort by distance
-        near_boids = self.grid.get_near(self, curr_cell)
-        selfCenter = pg.Vector2(self.rect.center)
-        neiboids = sorted(near_boids, key=lambda i: pg.Vector2(i.rect.center).distance_to(selfCenter))
+    def update(self, dt: float, neighbours) -> None:
+        neiboids = sorted(neighbours, key=lambda n: n.pos.distance_to(self.pos))
         del neiboids[7:]  # keep 7 closest, dump the rest
         # when boid has neighborS (walrus sets ncount)
         
@@ -65,9 +56,9 @@ class Boid(pg.sprite.Sprite):
             tAvejAng = degrees(atan2(yat, xat))
             targetV = (xvt / ncount, yvt / ncount)
             # if too close, move away from closest neighbor
-            if selfCenter.distance_to(nearestBoid) < self.bSize: 
+            if self.pos.distance_to(nearestBoid) < self.bSize: 
                 targetV = nearestBoid
-            tDiff = targetV - selfCenter  # get angle differences for steering
+            tDiff = targetV - self.pos  # get angle differences for steering
             tDistance, tAngle = pg.math.Vector2.as_polar(tDiff)
             # if boid is close enough to neighbors, match their average angle
             if tDistance < self.bSize*5: 
@@ -104,10 +95,9 @@ class Boid(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)  # recentering fix
         self.dir = pg.Vector2(1, 0).rotate(self.ang).normalize()
         self.pos += self.dir * dt * (SPEED + (7 - ncount) * 5)  # movement speed
-
-        # Actually update position of boid
-        self.rect.center = self.pos
         
+        self.rect.center = self.pos
+
     @property
     def cell(self) -> Cell:
         ''' xy coords to cell '''
