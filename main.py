@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-from math import pi, sin, cos, atan2, radians, degrees
+from math import sin, cos, atan2, radians, degrees
 from random import randint
-import PIL.ImageGrab
 import pygame as pg
 
 '''
@@ -9,24 +7,28 @@ PyNBoids - a Boids simulation - github.com/Nikorasu/PyNBoids
 This version uses a spatial partitioning grid to improve performance.
 Copyright (c) 2021  Nikolaus Stromberg  nikorasu85@gmail.com
 '''
-BOIDZ = 200             # How many boids to spawn, too many may slow fps
+FULLSCREEN = True       # True for Fullscreen, or False for Window
+BOIDZ = 100             # How many boids to spawn, too many may slow fps
 WRAP = False            # False avoids edges, True wraps to other side
-FISH = True            # True to turn boids into fish
-SPEED = 148             # Movement speed
+FISH = False            # True to turn boids into fish
+SPEED = 150             # Movement speed
+WIDTH = 900             # Window Width (1200)
+HEIGHT = 600            # Window Height (800)
+BGCOLOR = (0, 0, 0)     # Background color in RGB
 FPS = 60                # 30-90
-SHOWFPS = False         # frame rate debug
+SHOWFPS = True          # frame rate debug
 
 
 class Boid(pg.sprite.Sprite):
 
-    def __init__(self, grid, drawSurf, isFish=False):
+    def __init__(self, grid, drawSurf, isFish=False):  #, cHSV=None
         super().__init__()
         self.grid = grid
         self.drawSurf = drawSurf
         self.image = pg.Surface((15, 15)).convert()
         self.image.set_colorkey(0)
         self.color = pg.Color(0)  # preps color so we can use hsva
-        self.color.hsva = (randint(0,360), 99, 99) # randint(5,55) #4goldfish
+        self.color.hsva = (randint(0,360), 90, 90) #if cHSV is None else cHSV # randint(5,55) #4goldfish
         if isFish:  # (randint(120,300) + 180) % 360  #4noblues
             pg.draw.polygon(self.image, self.color, ((7,0),(12,5),(3,14),(11,14),(2,5),(7,0)), width=3)
             self.image = pg.transform.scale(self.image, (16, 24))
@@ -108,7 +110,7 @@ class Boid(pg.sprite.Sprite):
         self.rect.center = self.pos
 
 
-class BoidGrid():  # tracks boids in spatial partition grid
+class BoidGrid:  # tracks boids in spatial partition grid
 
     def __init__(self):
         self.grid_size = 100
@@ -137,20 +139,19 @@ class BoidGrid():  # tracks boids in spatial partition grid
         return nearby
 
 
-def pil2pgImage(pilImage):
-    return pg.image.fromstring(
-        pilImage.tobytes(), pilImage.size, pilImage.mode).convert()
-
-
 def main():
-    capture = PIL.ImageGrab.grab()
-    pg.init()
+    pg.init()  # prepare window
+    pg.display.set_caption("PyNBoids")
+    try: 
+        pg.display.set_icon(pg.image.load("nboids.png"))
+    except: 
+        print("Note: nboids.png icon not found, skipping..")
     # setup fullscreen or window mode
-    currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
-    screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
-    pg.mouse.set_visible(False)
-
-    background = pil2pgImage(capture)
+    if FULLSCREEN:
+        currentRez = (pg.display.Info().current_w, pg.display.Info().current_h)
+        screen = pg.display.set_mode(currentRez, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
+        pg.mouse.set_visible(False)
+    else: screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE | pg.SCALED, vsync=1)
 
     boidTracker = BoidGrid()
     nBoids = pg.sprite.Group()
@@ -167,8 +168,7 @@ def main():
                 return
 
         dt = clock.tick(FPS) / 1000
-        #screen.fill(0)
-        pg.Surface.blit(screen, background, (0,0))
+        screen.fill(BGCOLOR)
         # update boid logic, then draw them
         nBoids.update(dt, SPEED, WRAP)
         nBoids.draw(screen)
