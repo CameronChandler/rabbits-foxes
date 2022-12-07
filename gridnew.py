@@ -45,7 +45,7 @@ class Grid:
                 self.add(parent.__class__, parent.pos)
 
     def handle_predation(self, animals: AnimalDict) -> None:
-        pass
+        raise(NotImplementedError)
 
     def draw(self, screen: pg.surface.Surface) -> None:
         self.animals.draw(screen)
