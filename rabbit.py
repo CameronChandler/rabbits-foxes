@@ -1,4 +1,3 @@
-from math import sin, cos, atan2, radians, degrees
 from animal import Animal, AnimalDict
 from random import randint
 import pygame as pg
@@ -28,14 +27,14 @@ class Rabbit(Animal):
         self.rect = self.image.get_rect(center=self.pos)
 
     def choose_angle(self, neighbours: AnimalDict) -> float:
-        x_total = 0
-        y_total = 0
-        
-        for animal in neighbours[self.species]:
-            x_total += animal.pos.x
-            y_total += animal.pos.y
+        # Move away from nearest fox
+        if neighbours['Fox']:
+            return -self.angle_towards(neighbours['Fox'][0].pos)
+        # Move towards nearest rabbit
+        if neighbours['Rabbit']:
+            return -self.angle_towards(neighbours['Rabbit'][0].pos)
+        # Keep going
+        return self.angle
 
-        centre = (x_total/(len(neighbours[self.species])+ 0.001), y_total/(len(neighbours[self.species])+ 0.001))
-
-        return 90
-        return degrees(atan2(*(self.pos - centre)))
+    def give_birth(self) -> bool:
+        return np.random.uniform() < 0.001

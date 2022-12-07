@@ -19,18 +19,26 @@ class Animal(pg.sprite.Sprite):
     margin = 40
     speed: int
     turn_speed: int
+    birth_dist_from_parent = 5
 
     def __init__(self, window_size: tuple[int, int], grid_size: int):
         super().__init__()
         self.window_size = window_size
         self.window_centre = pg.Vector2(self.window_size[0]/2, self.window_size[1]/2)
         self.grid_size = grid_size
-        self.pos = pg.Vector2((randint(50, self.window_size[WIDTH ] - 50), 
-                               randint(50, self.window_size[HEIGHT] - 50)))
+        self.species = type(self).__name__
+        self.init_pos()
+
+    def init_pos(self, pos: None|pg.Vector2=None) -> None:
+        if pos:
+            d = self.birth_dist_from_parent
+            self.pos += pg.Vector2(np.random.uniform(-d, d), np.random.uniform(-d, d))
+        else:
+            self.pos = pg.Vector2((randint(50, self.window_size[WIDTH ] - 50), 
+                                   randint(50, self.window_size[HEIGHT] - 50)))
         self.angle = randint(0, 360)
         self.init_image()
         self.old_cell = self.cell
-        self.species = type(self).__name__
 
     def init_image(self) -> None:
         self.image = pg.Surface((15, 15)).convert()
@@ -96,6 +104,9 @@ class Animal(pg.sprite.Sprite):
 
     @abstractmethod
     def choose_angle(self, neighbours: AnimalDict) -> float:...
+
+    @abstractmethod
+    def give_birth(self) -> bool:...
     
     def get_neighbours(self, cells: dict[Cell, AnimalDict]) -> AnimalDict:
         ''' Returns a list of nearby animals within all surrounding 9 cells '''

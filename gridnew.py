@@ -1,16 +1,16 @@
-from animal import Cell, AnimalDict
+from animal import Animal, Cell, AnimalDict
 from rabbit import Rabbit
 from fox import Fox
 from collections import defaultdict
 import pygame as pg
-
-GRID_SIZE = 100
+from typing import Type
 
 empty_animals = lambda: defaultdict(list) # type: ignore
 
 class Grid:
     ''' Tracks animals in spatially partitioned grid '''
-    grid_size = GRID_SIZE
+    grid_size = 100
+    predation_distance = 5
 
     def __init__(self, num_rabbits: int, num_foxes: int, window_size: tuple[int, int]) -> None:
         self.cells: dict[Cell, AnimalDict] = defaultdict(empty_animals)
@@ -21,17 +21,31 @@ class Grid:
     def init_animals(self, num_rabbits: int, num_foxes: int) -> None:
         
         for _ in range(num_rabbits):
-            rabbit = Rabbit(self.window_size, self.grid_size)
-            self.animals.add(rabbit)
-            self.cells[rabbit.cell]['Rabbit'].append(rabbit)
+            self.add(Rabbit)
 
         for _ in range(num_foxes):
-            fox = Fox(self.window_size, self.grid_size)
-            self.animals.add(fox)
-            self.cells[fox.cell]['Fox'].append(fox)
+            self.add(Fox)
+
+    def add(self, animal_class: Type[Animal], pos: None|pg.Vector2=None) -> None:
+        animal = animal_class(self.window_size, self.grid_size)
+        if pos:
+            animal.pos = pos
+        self.animals.add(animal)
+        self.cells[animal.cell][animal_class.__name__].append(animal)
 
     def update(self) -> None:
         self.animals.update(self.cells)
+        #for animals in self.cells.values():
+        #    self.handle_births(animals)
+        #    self.handle_predation(animals)
+
+    def handle_births(self, animals: AnimalDict) -> None:
+        for parent in animals['Rabbit'] + animals['Fox']:
+            if parent.give_birth():
+                self.add(parent.__class__, parent.pos)
+
+    def handle_predation(self, animals: AnimalDict) -> None:
+        pass
 
     def draw(self, screen: pg.surface.Surface) -> None:
         self.animals.draw(screen)

@@ -1,4 +1,4 @@
-from math import sin, cos, atan2, radians, degrees
+from math import atan2, degrees
 from animal import Animal, AnimalDict
 from random import randint
 import pygame as pg
@@ -35,6 +35,9 @@ class Fox(Animal):
             x_total += animal.pos.x
             y_total += animal.pos.y
 
-        centre = (x_total/(len(neighbours[self.species])+ 0.001), y_total/(len(neighbours[self.species])+ 0.001))
+        centre = pg.Vector2(x_total/(len(neighbours[self.species])+ 0.001), y_total/(len(neighbours[self.species])+ 0.001))
 
-        return degrees(atan2(*(self.pos - centre)))
+        return self.angle_towards(centre)
+
+    def give_birth(self) -> bool:
+        return np.random.uniform() < 0.001
