@@ -20,7 +20,7 @@ SHOW_FPS = True          # frame rate debug
 
 class Window:
 
-    def __init__(self, full_screen: bool, show_fps: bool):
+    def __init__(self, full_screen: bool):
         self.screen = self.init_screen(full_screen)
         self.font = pg.font.Font(None, 30)
 
@@ -48,7 +48,7 @@ def is_quit() -> bool:
     return False
 
 def main():
-    window = Window(FULL_SCREEN, SHOW_FPS)
+    window = Window(FULL_SCREEN)
 
     boidTracker = Grid()
     boids = pg.sprite.Group()

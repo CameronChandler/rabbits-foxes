@@ -1,9 +1,8 @@
 import pygame as pg
-from boidnew import Boid
+from gridnew import Grid
 
 FULL_SCREEN = False  
 NUM_BOIDS = 100      
-SPEED = 150          
 WIDTH = 900          
 HEIGHT = 600         
 BGCOLOR = (0, 0, 0)  
@@ -12,16 +11,16 @@ SHOW_FPS = True
 
 class Window:
 
-    def __init__(self, full_screen: bool, show_fps: bool):
-        self.screen = self.init_screen(full_screen)
+    def __init__(self):
+        self.screen = self.init_screen()
         self.font = pg.font.Font(None, 30)
 
-    def init_screen(self, full_screen: bool) -> pg.surface.Surface:
+    def init_screen(self) -> pg.surface.Surface:
         pg.init()
         pg.display.set_caption('Rabbits and Foxes')
         pg.display.set_icon(pg.image.load('nboids.png'))
         
-        if full_screen:
+        if FULL_SCREEN:
             curr_resolution = pg.display.Info().current_w, pg.display.Info().current_h
             pg.mouse.set_visible(False)
             return pg.display.set_mode(curr_resolution, pg.SCALED | pg.NOFRAME | pg.FULLSCREEN, vsync=1)
@@ -41,11 +40,9 @@ def is_quit() -> bool:
     return False
 
 def main():
-    window = Window(FULL_SCREEN, SHOW_FPS)
+    window = Window()
 
-    boids = pg.sprite.Group()
-    for _ in range(NUM_BOIDS):
-        boids.add(Boid(window.screen.get_size()))
+    grid = Grid(NUM_BOIDS, NUM_BOIDS, window.screen.get_size())
 
     clock = pg.time.Clock()
 
@@ -57,8 +54,8 @@ def main():
         window.screen.fill(BGCOLOR)
         dt = clock.tick(FPS) / 1000
 
-        boids.update(dt, boids)
-        boids.draw(window.screen)
+        grid.update(dt)
+        grid.draw(window.screen)
         
         if SHOW_FPS: 
             window.draw_fps(int(clock.get_fps()))
