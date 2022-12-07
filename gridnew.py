@@ -1,34 +1,37 @@
-from boidnew import Boid, Cell
+from animal import Cell, AnimalDict
 from rabbit import Rabbit
+from fox import Fox
 from collections import defaultdict
 import pygame as pg
 
 GRID_SIZE = 100
 
+empty_animals = lambda: defaultdict(list)
+
 class Grid:
-    ''' Tracks boids in spatially partitioned grid '''
+    ''' Tracks animals in spatially partitioned grid '''
     grid_size = GRID_SIZE
 
     def __init__(self, num_rabbits: int, num_foxes: int, window_size: tuple[int, int]) -> None:
-        self.cells: dict[Cell, list[Boid]] = defaultdict(list)
-        self.boids = pg.sprite.Group()
+        self.cells: dict[Cell, AnimalDict] = defaultdict(empty_animals)
+        self.animals = pg.sprite.Group()
         self.window_size = window_size
         self.init_animals(num_rabbits, num_foxes)
 
     def init_animals(self, num_rabbits: int, num_foxes: int) -> None:
-
+        
         for _ in range(num_rabbits):
-            boid = Rabbit(self.window_size, self.grid_size)
-            self.boids.add(boid)
-            self.cells[boid.cell].append(boid)
+            rabbit = Rabbit(self.window_size, self.grid_size)
+            self.animals.add(rabbit)
+            self.cells[rabbit.cell]['Rabbit'].append(rabbit)
 
         for _ in range(num_foxes):
-            boid = Boid(self.window_size, self.grid_size)
-            self.boids.add(boid)
-            self.cells[boid.cell].append(boid)
+            fox = Fox(self.window_size, self.grid_size)
+            self.animals.add(fox)
+            self.cells[fox.cell]['Fox'].append(fox)
 
     def update(self, dt: float) -> None:
-        self.boids.update(dt, self.cells)
+        self.animals.update(dt, self.cells)
 
     def draw(self, screen: pg.surface.Surface) -> None:
-        self.boids.draw(screen)
+        self.animals.draw(screen)

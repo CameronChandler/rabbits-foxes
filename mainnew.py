@@ -2,7 +2,8 @@ import pygame as pg
 from gridnew import Grid
 
 FULL_SCREEN = False  
-NUM_BOIDS = 100      
+NUM_RABBITS = 100      
+NUM_FOXES = 100      
 WIDTH = 900          
 HEIGHT = 600         
 BGCOLOR = (0, 0, 0)  
@@ -42,7 +43,7 @@ def is_quit() -> bool:
 def main():
     window = Window()
 
-    grid = Grid(NUM_BOIDS, NUM_BOIDS, window.screen.get_size())
+    grid = Grid(NUM_RABBITS, NUM_FOXES, window.screen.get_size())
 
     clock = pg.time.Clock()
 

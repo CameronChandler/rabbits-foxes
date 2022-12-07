@@ -10,8 +10,8 @@ WIDTH, HEIGHT = 0, 1
 
 Cell = NamedTuple('Cell', [('x', int), ('y', int)])
 
-class Rabbit(Animal):
-    species = 'Rabbit'
+class Fox(Animal):
+    species = 'Fox'
 
     def __init__(self, window_size: tuple[int, int], grid_size: int):
         super().__init__(window_size, grid_size)
@@ -20,7 +20,7 @@ class Rabbit(Animal):
         self.image = pg.Surface((15, 15)).convert()
         self.image.set_colorkey(0)
         self.color = pg.Color(0)
-        self.color.hsva = (90, 90, 90) # type: ignore
+        self.color.hsva = (360, 90, 90) # type: ignore
         pg.draw.polygon(self.image, self.color, ((7,0), (13,14), (7,11), (1,14), (7,0)))
         self.bSize = 17
         self.orig_image = pg.transform.rotate(self.image.copy(), -90)
