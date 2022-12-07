@@ -29,15 +29,15 @@ class Grid:
     def add(self, animal_class: Type[Animal], pos: None|pg.Vector2=None) -> None:
         animal = animal_class(self.window_size, self.grid_size)
         if pos:
-            animal.pos = pos
+            animal.init_pos(pos)
         self.animals.add(animal)
         self.cells[animal.cell][animal_class.__name__].append(animal)
 
     def update(self) -> None:
         self.animals.update(self.cells)
-        #for animals in self.cells.values():
-        #    self.handle_births(animals)
-        #    self.handle_predation(animals)
+        for animals in list(self.cells.values()):
+            self.handle_births(animals)
+            self.handle_predation(animals)
 
     def handle_births(self, animals: AnimalDict) -> None:
         for parent in animals['Rabbit'] + animals['Fox']:

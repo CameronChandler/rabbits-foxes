@@ -19,7 +19,6 @@ class Animal(pg.sprite.Sprite):
     margin = 40
     speed: int
     turn_speed: int
-    birth_dist_from_parent = 5
 
     def __init__(self, window_size: tuple[int, int], grid_size: int):
         super().__init__()
@@ -31,8 +30,7 @@ class Animal(pg.sprite.Sprite):
 
     def init_pos(self, pos: None|pg.Vector2=None) -> None:
         if pos:
-            d = self.birth_dist_from_parent
-            self.pos += pg.Vector2(np.random.uniform(-d, d), np.random.uniform(-d, d))
+            self.pos = pos + pg.Vector2(np.random.uniform(-1, 1), np.random.uniform(-1, 1))
         else:
             self.pos = pg.Vector2((randint(50, self.window_size[WIDTH ] - 50), 
                                    randint(50, self.window_size[HEIGHT] - 50)))

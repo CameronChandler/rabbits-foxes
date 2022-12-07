@@ -48,6 +48,7 @@ def main():
     clock = pg.time.Clock()
 
     while True:
+        clock.tick(FPS)
         if is_quit():
             pg.quit()
             return
