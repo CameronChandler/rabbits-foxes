@@ -1,4 +1,4 @@
-#from math import sin, cos, atan2, radians, degrees
+from math import sin, cos, atan2, radians, degrees
 from random import randint
 import pygame as pg
 from typing import NamedTuple
@@ -6,24 +6,29 @@ import numpy as np
 from collections import defaultdict
 from abc import abstractmethod
 
-SPEED = 150 
 WIDTH, HEIGHT = 0, 1
+ANTICLOCKWISE, CLOCKWISE = -1, 1
 
 Cell = NamedTuple('Cell', [('x', int), ('y', int)])
 AnimalDict = dict[str, list['Animal']]
 
 class Animal(pg.sprite.Sprite):
 
+    # Number of nearest animals of a given species to "see"
+    nearest_k = 5
+    margin = 40
+    speed: int
+    turn_speed: int
+
     def __init__(self, window_size: tuple[int, int], grid_size: int):
         super().__init__()
         self.window_size = window_size
+        self.window_centre = pg.Vector2(self.window_size[0]/2, self.window_size[1]/2)
         self.grid_size = grid_size
         self.pos = pg.Vector2((randint(50, self.window_size[WIDTH ] - 50), 
                                randint(50, self.window_size[HEIGHT] - 50)))
-        self.dir = pg.Vector2(1, 0)
-        self.ang = randint(0, 360)
+        self.angle = randint(0, 360)
         self.init_image()
-        self.t = 0
         self.old_cell = self.cell
         self.species = type(self).__name__
 
@@ -46,21 +51,51 @@ class Animal(pg.sprite.Sprite):
 
         self.old_cell = new_cell
 
-    def update(self, dt: float, cells: dict[Cell, AnimalDict]) -> None: # type: ignore
+    def angle_towards(self, other: pg.Vector2) -> float:
+        ''' Calculate angle towards other position '''
+        return degrees(atan2(*(self.pos - other))) - 90
+
+    def signed_angle_diff(self, target_angle: float) -> float:
+        ''' Calculate signed difference between two angles. Returns value in [-180, 180] '''
+        return (self.angle - target_angle + 180) % 360 - 180
+
+    def update(self, cells: dict[Cell, AnimalDict]) -> None: # type: ignore
+        ''' Update call '''
         neighbours = self.get_neighbours(cells)
 
-        self.move(dt, neighbours)
+        target_angle, near_edges = self.handle_edges()
+        if not near_edges:
+            target_angle = self.choose_angle(neighbours)
+
+        self.image = pg.transform.rotate(self.orig_image, self.angle)
+
+        self.update_position(target_angle)
 
         self.update_cells(cells)
 
-        self.image = pg.transform.rotate(self.orig_image, -self.ang)
-        self.dir = pg.Vector2(1, 0).rotate(self.ang).normalize()
-        #self.pos += self.dir * dt * (SPEED + (7 - ncount) * 5)
+    def update_position(self, target_angle: float) -> None:
+        ''' Make move towards target_angle '''
+        angle_diff = self.signed_angle_diff(target_angle)
+        turn_direction = np.sign(angle_diff)
+        turn_magnitude = 1 - abs(angle_diff) / 180 # in [0, 1]
+
+        self.angle += turn_magnitude * self.turn_speed * turn_direction
+        self.angle %= 360
+
+        self.pos.x += self.speed * cos(radians(self.angle))
+        self.pos.y -= self.speed * sin(radians(self.angle))
 
         self.rect.center = self.pos # type: ignore
 
+    def handle_edges(self) -> tuple[float, bool]:
+        ''' Returns target angle and bool True if animal was near edges '''
+        if min(self.x, self.window_size[WIDTH]  - self.x,
+               self.y, self.window_size[HEIGHT] - self.y) < self.margin:
+            return self.angle_towards(self.window_centre), True
+        return self.angle, False
+
     @abstractmethod
-    def move(self, dt: float, neighbours: AnimalDict) -> None:...
+    def choose_angle(self, neighbours: AnimalDict) -> float:...
     
     def get_neighbours(self, cells: dict[Cell, AnimalDict]) -> AnimalDict:
         ''' Returns a list of nearby animals within all surrounding 9 cells '''
@@ -71,7 +106,18 @@ class Animal(pg.sprite.Sprite):
                 neighbours['Rabbit'] += animals.get('Rabbit', [])
                 neighbours['Fox']    += animals.get('Fox', [])
         neighbours[self.species].remove(self)
+        
+        neighbours['Fox']    = sorted(neighbours['Fox'],    key=lambda fox: fox.pos.distance_to(self.pos))[:self.nearest_k]
+        neighbours['Rabbit'] = sorted(neighbours['Rabbit'], key=lambda fox: fox.pos.distance_to(self.pos))[:self.nearest_k]
         return neighbours
+
+    @property
+    def x(self) -> float:
+        return self.rect.centerx # type: ignore
+
+    @property
+    def y(self) -> float:
+        return self.rect.centery # type: ignore
 
     @property
     def cell(self) -> Cell:

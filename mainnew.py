@@ -2,8 +2,8 @@ import pygame as pg
 from gridnew import Grid
 
 FULL_SCREEN = False  
-NUM_RABBITS = 100      
-NUM_FOXES = 100      
+NUM_RABBITS = 50      
+NUM_FOXES = 50     
 WIDTH = 900          
 HEIGHT = 600         
 BGCOLOR = (0, 0, 0)  
@@ -53,9 +53,8 @@ def main():
             return
 
         window.screen.fill(BGCOLOR)
-        dt = clock.tick(FPS) / 1000
 
-        grid.update(dt)
+        grid.update()
         grid.draw(window.screen)
         
         if SHOW_FPS: 

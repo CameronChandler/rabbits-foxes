@@ -6,7 +6,7 @@ import pygame as pg
 
 GRID_SIZE = 100
 
-empty_animals = lambda: defaultdict(list)
+empty_animals = lambda: defaultdict(list) # type: ignore
 
 class Grid:
     ''' Tracks animals in spatially partitioned grid '''
@@ -30,8 +30,8 @@ class Grid:
             self.animals.add(fox)
             self.cells[fox.cell]['Fox'].append(fox)
 
-    def update(self, dt: float) -> None:
-        self.animals.update(dt, self.cells)
+    def update(self) -> None:
+        self.animals.update(self.cells)
 
     def draw(self, screen: pg.surface.Surface) -> None:
         self.animals.draw(screen)
