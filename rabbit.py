@@ -1,5 +1,5 @@
 #from math import sin, cos, atan2, radians, degrees
-from animal import Animal
+from animal import Animal, AnimalDict
 from random import randint
 import pygame as pg
 from typing import NamedTuple
@@ -25,3 +25,17 @@ class Rabbit(Animal):
         self.bSize = 17
         self.orig_image = pg.transform.rotate(self.image.copy(), -90)
         self.rect = self.image.get_rect(center=self.pos)
+
+    def move(self, dt: float, neighbours: AnimalDict) -> None:
+        x_total = 0
+        y_total = 0
+        
+        for animal in neighbours[self.species]:
+            x_total += animal.pos.x
+            y_total += animal.pos.y
+
+        centre = (x_total/(len(neighbours[self.species])+ 0.001), y_total/(len(neighbours[self.species])+ 0.001))
+
+        self.t += 5*dt
+        self.pos.x += -np.sign(self.pos.x - centre[0]) + randint(-1, 1)
+        self.pos.y += -np.sign(self.pos.y - centre[1]) + randint(-1, 1)

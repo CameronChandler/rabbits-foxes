@@ -4,6 +4,7 @@ import pygame as pg
 from typing import NamedTuple
 import numpy as np
 from collections import defaultdict
+from abc import abstractmethod
 
 SPEED = 150 
 WIDTH, HEIGHT = 0, 1
@@ -48,8 +49,6 @@ class Animal(pg.sprite.Sprite):
     def update(self, dt: float, cells: dict[Cell, AnimalDict]) -> None: # type: ignore
         neighbours = self.get_neighbours(cells)
 
-        #print('Neighbors', neighbours)
-
         self.move(dt, neighbours)
 
         self.update_cells(cells)
@@ -60,19 +59,8 @@ class Animal(pg.sprite.Sprite):
 
         self.rect.center = self.pos # type: ignore
 
-    def move(self, dt: float, neighbours: AnimalDict) -> None:
-        x_total = 0
-        y_total = 0
-        
-        for animal in neighbours[self.species]:
-            x_total += animal.pos.x
-            y_total += animal.pos.y
-
-        centre = (x_total/(len(neighbours[self.species])+ 0.001), y_total/(len(neighbours[self.species])+ 0.001))
-
-        self.t += 5*dt
-        self.pos.x += -np.sign(self.pos.x - centre[0]) + randint(-1, 1)
-        self.pos.y += -np.sign(self.pos.y - centre[1]) + randint(-1, 1)
+    @abstractmethod
+    def move(self, dt: float, neighbours: AnimalDict) -> None:...
     
     def get_neighbours(self, cells: dict[Cell, AnimalDict]) -> AnimalDict:
         ''' Returns a list of nearby animals within all surrounding 9 cells '''
