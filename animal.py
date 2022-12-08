@@ -24,6 +24,7 @@ class Animal(pg.sprite.Sprite):
     birth_energy = 0.7
     death_factor = 50_000
     adult_age = 5*60 # frames
+    birth_recovery = 3*60 # frames
 
     def __init__(self, window_size: tuple[int, int], grid_size: int, age: int | None=None):
         super().__init__()
@@ -33,9 +34,10 @@ class Animal(pg.sprite.Sprite):
         self.species = type(self).__name__
         self.init_pos()
         self.__hash__ = lambda: hash(np.random.uniform())
+        self.time_since_last_birth = self.adult_age
 
         if age is None:
-            self.age = np.random.randint(0, self.old_age) # type: ignore
+            self.age = np.random.randint(0, self.old_age//2) # type: ignore
         else:
             self.age = age
 
@@ -80,6 +82,7 @@ class Animal(pg.sprite.Sprite):
         ''' Update call '''
         self.handle_energy()
         self.age += 1
+        self.time_since_last_birth += 1
 
         neighbours = self.get_neighbours(cells)
 

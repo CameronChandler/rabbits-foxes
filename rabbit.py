@@ -36,9 +36,14 @@ class Rabbit(Animal):
         return self.angle
 
     def give_birth(self) -> bool:
-        if self.age < self.adult_age:
+        if (self.age < self.adult_age) or (self.time_since_last_birth < self.birth_recovery):
             return False
-        return np.random.uniform() < 0.002
+
+        if np.random.uniform() < 0.002:
+            self.time_since_last_birth = 0
+            return True
+
+        return False
 
     
     def handle_energy(self) -> None:

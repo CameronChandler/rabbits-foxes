@@ -2,10 +2,10 @@ import pygame as pg
 from gridnew import Grid
 
 FULL_SCREEN = False  
-NUM_RABBITS = 10      
-NUM_FOXES = 10   
-WIDTH = 900          
-HEIGHT = 600         
+NUM_RABBITS = 30      
+NUM_FOXES = 30   
+WIDTH = 2560          
+HEIGHT = 1440         
 BGCOLOR = (0, 0, 0)  
 FPS = 60             
 SHOW_FPS = True      

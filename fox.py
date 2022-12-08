@@ -36,13 +36,18 @@ class Fox(Animal):
         return self.angle
 
     def give_birth(self) -> bool:
-        if (self.energy < self.birth_energy) or (self.age < self.adult_age):
+        if (self.energy < self.birth_energy) or (self.age < self.adult_age) or (self.time_since_last_birth < self.birth_recovery):
             return False
-        return np.random.uniform() < 0.001
+        
+        if np.random.uniform() < 0.002:
+            self.time_since_last_birth = 0
+            return True
+
+        return False
 
     def eaten(self):
         ''' Method called when fox eats a rabbit '''
-        self.energy = min(self.energy + 0.5, 1)
+        self.energy = 1
     
     def handle_energy(self) -> None:
         self.energy -= 0.0005
