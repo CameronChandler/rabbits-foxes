@@ -37,3 +37,7 @@ class Rabbit(Animal):
 
     def give_birth(self) -> bool:
         return np.random.uniform() < 0.001
+
+    
+    def handle_energy(self) -> None:
+        ...

@@ -34,12 +34,17 @@ class Grid:
         self.animals.add(animal)
         self.cells[animal.cell][animal_class.__name__].append(animal)
 
+    def remove(self, animal: Animal) -> None:
+        self.cells[animal.cell][type(animal).__name__].remove(animal)
+        self.animals.remove(animal)
+        del animal
+
     def update(self) -> None:
         self.animals.update(self.cells)
         for animals in list(self.cells.values()):
             self.handle_births(animals)
-            #self.handle_predation(animals)
-            #self.handle_starving(animals)
+            self.handle_predation(animals)
+            self.handle_starving(animals)
 
     def handle_births(self, animals: AnimalDict) -> None:
         for parent in animals['Rabbit'] + animals['Fox']:
@@ -53,7 +58,15 @@ class Grid:
                 if np.linalg.norm(fox.pos - rabbit.pos) < self.predation_distance:
                     eaten[rabbit] = fox
 
+        for rabbit, fox in eaten.items():
+            fox.eaten()
+            self.remove(rabbit)
 
+    def handle_starving(self, animals: AnimalDict) -> None:
+        starved = [fox for fox in animals['Fox'] if fox.energy <= 0]
+        
+        for fox in starved:
+            self.remove(fox)
 
     def draw(self, screen: pg.surface.Surface) -> None:
         self.animals.draw(screen)

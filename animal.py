@@ -19,8 +19,10 @@ class Animal(pg.sprite.Sprite):
     margin = 40
     speed: int
     turn_speed: int
+    energy = 1
+    birth_energy = 0.7
 
-    def __init__(self, window_size: tuple[int, int], grid_size: int):
+    def __init__(self, window_size: tuple[int, int], grid_size: int, age: int | None=None):
         super().__init__()
         self.window_size = window_size
         self.window_centre = pg.Vector2(self.window_size[0]/2, self.window_size[1]/2)
@@ -28,6 +30,11 @@ class Animal(pg.sprite.Sprite):
         self.species = type(self).__name__
         self.init_pos()
         self.__hash__ = lambda: hash(np.random.uniform())
+
+        if age is None:
+            self.age = np.random.randint(0, 1_200) # type: ignore
+        else:
+            self.age = age
 
     def init_pos(self, pos: None|pg.Vector2=None) -> None:
         if pos:
@@ -68,6 +75,8 @@ class Animal(pg.sprite.Sprite):
 
     def update(self, cells: dict[Cell, AnimalDict]) -> None: # type: ignore
         ''' Update call '''
+        self.handle_energy()
+
         neighbours = self.get_neighbours(cells)
 
         target_angle, near_edges = self.handle_edges()
@@ -79,6 +88,9 @@ class Animal(pg.sprite.Sprite):
         self.update_position(target_angle)
 
         self.update_cells(cells)
+
+    @abstractmethod
+    def handle_energy(self) -> None:...
 
     def update_position(self, target_angle: float) -> None:
         ''' Make move towards target_angle '''
