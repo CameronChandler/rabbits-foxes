@@ -17,9 +17,10 @@ class Animal(pg.sprite.Sprite):
     # Number of nearest animals of a given species to "see"
     nearest_k = 5
     margin = 40
-    speed: int
+    max_speed: int
     turn_speed: int
     energy = 1
+    old_age = 1_200 # frames
     birth_energy = 0.7
 
     def __init__(self, window_size: tuple[int, int], grid_size: int, age: int | None=None):
@@ -76,6 +77,7 @@ class Animal(pg.sprite.Sprite):
     def update(self, cells: dict[Cell, AnimalDict]) -> None: # type: ignore
         ''' Update call '''
         self.handle_energy()
+        self.age += 1
 
         neighbours = self.get_neighbours(cells)
 
@@ -145,3 +147,8 @@ class Animal(pg.sprite.Sprite):
     def cell(self) -> Cell:
         ''' xy coords to cell '''
         return Cell(int(self.pos.x//self.grid_size), int(self.pos.y//self.grid_size))
+
+    @property
+    def speed(self) -> float:
+        ''' Calculate current speed depending on age '''
+        return self.max_speed * 10**( (-self.age / self.old_age)**2 )

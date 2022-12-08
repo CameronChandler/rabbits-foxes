@@ -9,7 +9,7 @@ Cell = NamedTuple('Cell', [('x', int), ('y', int)])
 
 class Rabbit(Animal):
     species = 'Rabbit'
-    speed = 1
+    max_speed = 1
     turn_speed = 4
 
     def __init__(self, window_size: tuple[int, int], grid_size: int):
