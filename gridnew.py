@@ -27,8 +27,8 @@ class Grid:
         for _ in range(num_foxes):
             self.add(Fox)
 
-    def add(self, animal_class: Type[Animal], pos: None|pg.Vector2=None) -> None:
-        animal = animal_class(self.window_size, self.grid_size)
+    def add(self, animal_class: Type[Animal], pos: None|pg.Vector2=None, age: int|None=None) -> None:
+        animal = animal_class(self.window_size, self.grid_size, age)
         if pos:
             animal.init_pos(pos)
         self.animals.add(animal)
@@ -45,11 +45,12 @@ class Grid:
             self.handle_births(animals)
             self.handle_predation(animals)
             self.handle_starving(animals)
+            self.handle_old_age(animals)
 
     def handle_births(self, animals: AnimalDict) -> None:
         for parent in animals['Rabbit'] + animals['Fox']:
             if parent.give_birth():
-                self.add(parent.__class__, parent.pos)
+                self.add(parent.__class__, parent.pos, age=0)
 
     def handle_predation(self, animals: AnimalDict) -> None:
         eaten: dict[Rabbit, Fox] = {}
@@ -61,6 +62,12 @@ class Grid:
         for rabbit, fox in eaten.items():
             fox.eaten()
             self.remove(rabbit)
+
+    def handle_old_age(self, animals: AnimalDict) -> None:
+        died = [animal for animal in animals['Fox'] + animals['Rabbit'] if animal.died_of_old_age()]
+        
+        for animal in died:
+            self.remove(animal)
 
     def handle_starving(self, animals: AnimalDict) -> None:
         starved = [fox for fox in animals['Fox'] if fox.energy <= 0]

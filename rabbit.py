@@ -12,8 +12,8 @@ class Rabbit(Animal):
     max_speed = 1
     turn_speed = 4
 
-    def __init__(self, window_size: tuple[int, int], grid_size: int):
-        super().__init__(window_size, grid_size)
+    def __init__(self, window_size: tuple[int, int], grid_size: int, age: int | None=None):
+        super().__init__(window_size, grid_size, age)
         
     def init_image(self) -> None:
         self.image = pg.Surface((15, 15)).convert()
@@ -36,7 +36,9 @@ class Rabbit(Animal):
         return self.angle
 
     def give_birth(self) -> bool:
-        return np.random.uniform() < 0.001
+        if self.age < self.adult_age:
+            return False
+        return np.random.uniform() < 0.002
 
     
     def handle_energy(self) -> None:

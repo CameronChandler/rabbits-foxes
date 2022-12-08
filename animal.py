@@ -20,8 +20,10 @@ class Animal(pg.sprite.Sprite):
     max_speed: int
     turn_speed: int
     energy = 1
-    old_age = 1_200 # frames
+    old_age = 10_000 # frames
     birth_energy = 0.7
+    death_factor = 50_000
+    adult_age = 5*60 # frames
 
     def __init__(self, window_size: tuple[int, int], grid_size: int, age: int | None=None):
         super().__init__()
@@ -33,7 +35,7 @@ class Animal(pg.sprite.Sprite):
         self.__hash__ = lambda: hash(np.random.uniform())
 
         if age is None:
-            self.age = np.random.randint(0, 1_200) # type: ignore
+            self.age = np.random.randint(0, self.old_age) # type: ignore
         else:
             self.age = age
 
@@ -135,6 +137,10 @@ class Animal(pg.sprite.Sprite):
         neighbours['Rabbit'] = sorted(neighbours['Rabbit'], key=lambda fox: fox.pos.distance_to(self.pos))[:self.nearest_k]
         return neighbours
 
+    def died_of_old_age(self) -> bool:
+        p = 2 ** ( -(self.age/self.death_factor)**2 )
+        return np.random.choice([0, 1], p=[p, 1-p]) # type: ignore
+
     @property
     def x(self) -> float:
         return self.rect.centerx # type: ignore
@@ -151,4 +157,4 @@ class Animal(pg.sprite.Sprite):
     @property
     def speed(self) -> float:
         ''' Calculate current speed depending on age '''
-        return self.max_speed * 10**( (-self.age / self.old_age)**2 )
+        return self.max_speed * (10**( -(self.age / self.old_age)**2 ))
