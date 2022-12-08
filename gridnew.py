@@ -37,7 +37,8 @@ class Grid:
         self.animals.update(self.cells)
         for animals in list(self.cells.values()):
             self.handle_births(animals)
-            self.handle_predation(animals)
+            #self.handle_predation(animals)
+            #self.handle_starving(animals)
 
     def handle_births(self, animals: AnimalDict) -> None:
         for parent in animals['Rabbit'] + animals['Fox']:

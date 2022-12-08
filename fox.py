@@ -1,6 +1,4 @@
-from math import atan2, degrees
 from animal import Animal, AnimalDict
-from random import randint
 import pygame as pg
 from typing import NamedTuple
 import numpy as np
@@ -11,7 +9,7 @@ Cell = NamedTuple('Cell', [('x', int), ('y', int)])
 
 class Fox(Animal):
     species = 'Fox'
-    speed = 1
+    speed = 2
     turn_speed = 2
 
     def __init__(self, window_size: tuple[int, int], grid_size: int):
@@ -28,16 +26,14 @@ class Fox(Animal):
         self.rect = self.image.get_rect(center=self.pos)
 
     def choose_angle(self, neighbours: AnimalDict) -> float:
-        x_total = 0
-        y_total = 0
-        
-        for animal in neighbours[self.species]:
-            x_total += animal.pos.x
-            y_total += animal.pos.y
-
-        centre = pg.Vector2(x_total/(len(neighbours[self.species])+ 0.001), y_total/(len(neighbours[self.species])+ 0.001))
-
-        return self.angle_towards(centre)
+        # Move away from nearest fox
+        if neighbours['Fox']:
+            return -self.angle_towards(neighbours['Fox'][0].pos) # type: ignore
+        # Move towards nearest rabbit
+        if neighbours['Rabbit']:
+            return self.angle_towards(neighbours['Rabbit'][0].pos) # type: ignore
+        # Keep going
+        return self.angle
 
     def give_birth(self) -> bool:
         return np.random.uniform() < 0.001

@@ -1,5 +1,4 @@
 from animal import Animal, AnimalDict
-from random import randint
 import pygame as pg
 from typing import NamedTuple
 import numpy as np
@@ -11,7 +10,7 @@ Cell = NamedTuple('Cell', [('x', int), ('y', int)])
 class Rabbit(Animal):
     species = 'Rabbit'
     speed = 1
-    turn_speed = 2
+    turn_speed = 4
 
     def __init__(self, window_size: tuple[int, int], grid_size: int):
         super().__init__(window_size, grid_size)
@@ -27,12 +26,12 @@ class Rabbit(Animal):
         self.rect = self.image.get_rect(center=self.pos)
 
     def choose_angle(self, neighbours: AnimalDict) -> float:
-        # Move away from nearest fox
-        if neighbours['Fox']:
-            return -self.angle_towards(neighbours['Fox'][0].pos)
         # Move towards nearest rabbit
         if neighbours['Rabbit']:
-            return -self.angle_towards(neighbours['Rabbit'][0].pos)
+            return self.angle_towards(neighbours['Rabbit'][0].pos) # type: ignore
+        # Move away from nearest fox
+        if neighbours['Fox']:
+            return -self.angle_towards(neighbours['Fox'][0].pos) # type: ignore
         # Keep going
         return self.angle
 
