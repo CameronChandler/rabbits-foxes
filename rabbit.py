@@ -26,12 +26,12 @@ class Rabbit(Animal):
         self.rect = self.image.get_rect(center=self.pos)
 
     def choose_angle(self, neighbours: AnimalDict) -> float:
-        # Move towards nearest rabbit
-        if neighbours['Rabbit']:
-            return self.angle_towards(neighbours['Rabbit'][0].pos) # type: ignore
         # Move away from nearest fox
         if neighbours['Fox']:
             return -self.angle_towards(neighbours['Fox'][0].pos) # type: ignore
+        # Move towards nearest rabbit
+        if neighbours['Rabbit']:
+            return self.angle_towards(neighbours['Rabbit'][0].pos) # type: ignore
         # Keep going
         return self.angle
 

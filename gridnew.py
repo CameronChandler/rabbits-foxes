@@ -4,6 +4,7 @@ from fox import Fox
 from collections import defaultdict
 import pygame as pg
 from typing import Type
+import numpy as np
 
 empty_animals = lambda: defaultdict(list) # type: ignore
 
@@ -46,7 +47,13 @@ class Grid:
                 self.add(parent.__class__, parent.pos)
 
     def handle_predation(self, animals: AnimalDict) -> None:
-        raise(NotImplementedError)
+        eaten: dict[Rabbit, Fox] = {}
+        for fox in animals['Fox']:
+            for rabbit in animals['Rabbit']:
+                if np.linalg.norm(fox.pos - rabbit.pos) < self.predation_distance:
+                    eaten[rabbit] = fox
+
+
 
     def draw(self, screen: pg.surface.Surface) -> None:
         self.animals.draw(screen)

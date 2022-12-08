@@ -27,6 +27,7 @@ class Animal(pg.sprite.Sprite):
         self.grid_size = grid_size
         self.species = type(self).__name__
         self.init_pos()
+        self.__hash__ = lambda: hash(np.random.uniform())
 
     def init_pos(self, pos: None|pg.Vector2=None) -> None:
         if pos:
